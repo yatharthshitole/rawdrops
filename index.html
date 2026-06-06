@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback — RawDrops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #1a73e8;
+      --blue-h: #1557b0;
+      --blue-bg: #e8f0fe;
+      --green: #188038;
+      --green-bg: #e6f4ea;
+      --text: #202124;
+      --text2: #5f6368;
+      --text3: #80868b;
+      --border: #dadce0;
+      --surface: #fff;
+      --bg: #f8f9fa;
+      --err: #d93025;
+      --err-bg: #fce8e6;
+      --gold: #f9a825;
+      --gold-bg: #fffde7;
+      --gold-border: #fde680;
+      --r: 12px;
+      --s1: 0 1px 3px rgba(60,64,67,.1), 0 1px 2px rgba(60,64,67,.06);
+      --s2: 0 2px 8px rgba(60,64,67,.12), 0 1px 3px rgba(60,64,67,.07);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',-apple-system,sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+
+    /* ── Topbar ── */
+    .topbar{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+    .tb-left{display:flex;align-items:center;gap:10px}
+    .tb-logo{width:34px;height:34px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .tb-logo svg{width:18px;height:18px;fill:#fff}
+    .tb-name{font-family:'Sora',sans-serif;font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--text)}
+    .tb-name b{color:var(--blue)}
+    .tb-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text2);padding:7px 14px;border-radius:100px;border:1px solid var(--border);text-decoration:none;transition:.15s}
+    .tb-link:hover{background:var(--blue-bg);border-color:#c5d9fb;color:var(--blue)}
+    .tb-link svg{width:14px;height:14px;fill:currentColor}
+
+    /* ── Page ── */
+    .page{max-width:600px;margin:0 auto;padding:36px 16px 72px}
+
+    /* ── Hero ── */
+    .hero{background:var(--surface);border-radius:var(--r);border-top:5px solid var(--blue);box-shadow:var(--s1);padding:28px 32px 24px;margin-bottom:14px;animation:up .4s ease both}
+    .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+    .dot{width:6px;height:6px;background:var(--blue);border-radius:50%;animation:blink 2s ease infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+    .hero h1{font-family:'Sora',sans-serif;font-weight:700;font-size:22px;letter-spacing:-.025em;line-height:1.3;margin-bottom:8px}
+    .hero p{font-size:13px;color:var(--text2);font-weight:400;line-height:1.7}
+
+    /* ── Reward strip ── */
+    .reward-strip{display:flex;align-items:center;gap:14px;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--r);padding:14px 18px;margin-bottom:14px;animation:up .4s .06s ease both}
+    .rs-ico{font-size:24px;flex-shrink:0;line-height:1}
+    .rs-text strong{display:block;font-size:13px;font-weight:600;color:#6d4c00;margin-bottom:2px}
+    .rs-text span{font-size:12px;color:#8a6200;line-height:1.55}
+    .rs-text a{color:var(--blue);font-weight:600;text-decoration:none}
+    .rs-text a:hover{text-decoration:underline}
+
+    /* ── Card ── */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--s1);padding:28px 32px 26px;animation:up .4s .1s ease both}
+
+    /* ── Fields ── */
+    .field{margin-bottom:20px}
+    .label{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+    .req{color:var(--err);font-size:11px}
+    .wrap{position:relative}
+    .ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;color:var(--text3)}
+    .ico.top{top:13px;transform:none}
+    input[type=number],textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px 11px 40px;outline:none;transition:border .18s,box-shadow .18s;appearance:none;-moz-appearance:textfield}
+    input[type=number]::-webkit-inner-spin-button{display:none}
+    textarea{resize:vertical;min-height:128px;padding-top:12px;line-height:1.65}
+    input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,115,232,.13)}
+    input::placeholder,textarea::placeholder{color:var(--text3);font-weight:300}
+    input.e,textarea.e{border-color:var(--err);box-shadow:0 0 0 3px rgba(217,48,37,.09)}
+    .emsg{display:none;font-size:11px;color:var(--err);margin-top:5px;padding-left:1px}
+    .emsg.on{display:block}
+    .hint{font-size:11px;color:var(--text3);margin-top:5px;padding-left:1px}
+    .hint a{color:var(--blue)}
+
+    /* ── Divider ── */
+    .divider{border:none;border-top:1px solid var(--border);margin:22px 0 18px}
+
+    /* ── Actions ── */
+    .actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    .clear{font-size:13px;font-weight:500;color:var(--blue);background:none;border:none;cursor:pointer;padding:3px 0;text-decoration:none;transition:.15s}
+    .clear:hover{color:var(--blue-h);text-decoration:underline}
+    .submit{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--blue);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border:none;border-radius:6px;padding:10px 28px;cursor:pointer;min-width:130px;position:relative;transition:background .15s,box-shadow .15s,transform .1s}
+    .submit:hover:not(:disabled){background:var(--blue-h);box-shadow:0 2px 10px rgba(26,115,232,.28)}
+    .submit:active:not(:disabled){transform:scale(.98)}
+    .submit:disabled{opacity:.6;cursor:not-allowed}
+    .sl{position:relative}
+    .sp{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
+    .submit.loading .sl{display:none}
+    .submit.loading .sp{display:block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .api-err{display:none;background:var(--err-bg);border:1px solid #f5b7b1;border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--err);margin-top:14px}
+
+    /* ── Success ── */
+    .success{display:none;flex-direction:column;align-items:center;text-align:center;padding:8px 0 4px}
+    .success.on{display:flex;animation:up .4s ease both}
+    .form-body.gone{display:none}
+
+    .check-ring{width:66px;height:66px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px;animation:pop .45s cubic-bezier(.34,1.56,.64,1) both}
+    @keyframes pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+    .check-ring svg{width:32px;height:32px;stroke:var(--green);stroke-width:2.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .ck{stroke-dasharray:44;stroke-dashoffset:44;animation:draw .4s .32s ease forwards}
+    @keyframes draw{to{stroke-dashoffset:0}}
+
+    .s-title{font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-.015em;margin-bottom:6px}
+    .s-sub{font-size:13px;color:var(--text2);max-width:300px;line-height:1.7}
+
+    /* Reward box in success */
+    .rwd-box{margin-top:22px;width:100%;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:10px;padding:16px 18px;display:flex;align-items:flex-start;gap:12px;animation:up .45s .5s ease both;opacity:0;animation-fill-mode:both}
+    .rwd-ico{font-size:22px;flex-shrink:0;margin-top:1px}
+    .rwd-content strong{display:block;font-size:13px;font-weight:600;color:#6d4c00;margin-bottom:4px}
+    .rwd-content p{font-size:12px;color:#8a6200;line-height:1.65}
+    .rwd-content a{color:var(--blue);font-weight:600;text-decoration:none}
+    .rwd-content a:hover{text-decoration:underline}
+    .rwd-tag{display:inline-flex;align-items:center;gap:4px;background:#fff3cd;border:1px solid #fdd663;border-radius:100px;padding:3px 10px;font-size:11px;font-weight:600;color:#7c5c00;margin-top:8px}
+
+    /* ── Footer ── */
+    .footer{margin-top:28px;text-align:center;font-size:11px;color:var(--text3);animation:up .4s .2s ease both}
+    .footer a{color:var(--blue);text-decoration:none;font-weight:500}
+    .footer a:hover{text-decoration:underline}
+
+    /* ── Animation ── */
+    @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+    @media(max-width:480px){
+      .hero,.card{padding:22px 18px 20px}
+      .reward-strip{padding:12px 14px;gap:10px}
+      .topbar{padding:0 16px}
+      .tb-link .lbl{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="tb-left">
+    <div class="tb-logo">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </div>
+    <span class="tb-name">Raw<b>Drops</b> Feedback</span>
+  </div>
+  <a class="tb-link" href="https://t.me/rawdrops1" target="_blank">
+    <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    <span class="lbl">@rawdrops1</span>
+  </a>
+</nav>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="eyebrow"><span class="dot"></span> Open for Feedback</div>
+    <h1>Help Us Build a Better<br>Arcadia Experience 🎮</h1>
+    <p>Your suggestions matter. Every piece of feedback is personally reviewed by the RawDrops team to improve the game for everyone.</p>
+  </div>
+
+  <div class="reward-strip">
+    <div class="rs-ico">🎁</div>
+    <div class="rs-text">
+      <strong>Submit Feedback · Earn a Reward</strong>
+      <span>Share genuine suggestions and get rewarded. Join <a href="https://t.me/rawdrops1" target="_blank">@rawdrops1</a> to find out more.</span>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <div class="form-body" id="formBody">
+
+      <div class="field">
+        <div class="label">Telegram User ID <span class="req">*</span></div>
+        <div class="wrap">
+          <span class="ico">🪪</span>
+          <input type="number" id="tgId" placeholder="e.g. 123456789" inputmode="numeric" autocomplete="off" />
+        </div>
+        <div class="hint">Don't know your ID? Message <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> on Telegram.</div>
+        <div class="emsg" id="tgErr">Please enter your Telegram User ID.</div>
+      </div>
+
+      <div class="field">
+        <div class="label">Suggestion / Feedback <span class="req">*</span></div>
+        <div class="wrap">
+          <span class="ico top">💬</span>
+          <textarea id="fb" placeholder="Tell us what you love, what needs fixing, or any new feature ideas for the Arcadia Bot..."></textarea>
+        </div>
+        <div class="emsg" id="fbErr">Please write your feedback before submitting.</div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="actions">
+        <button class="clear" onclick="clearForm()">Clear form</button>
+        <button class="submit" id="submitBtn" onclick="doSubmit()">
+          <span class="sl">Submit</span>
+          <div class="sp"></div>
+        </button>
+      </div>
+
+      <div class="api-err" id="apiErr"></div>
+
+    </div>
+
+    <div class="success" id="success">
+      <div class="check-ring">
+        <svg viewBox="0 0 32 32">
+          <polyline class="ck" points="5,17 13,25 27,9"/>
+        </svg>
+      </div>
+      <div class="s-title">Thank You for Your Feedback! 🎉</div>
+      <p class="s-sub">We've received your response and will review it soon. You're helping make RawDrops better for everyone.</p>
+
+      <div class="rwd-box">
+        <div class="rwd-ico">🎁</div>
+        <div class="rwd-content">
+          <strong>Your Reward is Ready!</strong>
+          <p>You've unlocked a reward for submitting feedback.<br>
+          Join <a href="https://t.me/rawdrops1" target="_blank">@rawdrops1</a> on Telegram and send your User ID to claim it.</p>
+          <div class="rwd-tag">🏆 Reward Unlocked · Claim on @rawdrops1</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    RawDrops Arcadia &nbsp;·&nbsp;
+    <a href="https://t.me/rawdrops1" target="_blank">@rawdrops1</a>
+    &nbsp;·&nbsp; Developed by <a href="https://t.me/yatharth_78" target="_blank">@yatharth_78</a> &nbsp;·&nbsp;
+    <a href="https://t.me/tool4x" target="_blank"></a>
+  </div>
+
+</div>
+
+<script>
+  function clearForm() {
+    ['tgId','fb'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = '';
+      el.classList.remove('e');
+    });
+    document.getElementById('tgErr').classList.remove('on');
+    document.getElementById('fbErr').classList.remove('on');
+    document.getElementById('apiErr').style.display = 'none';
+  }
+
+  async function doSubmit() {
+    const tgEl  = document.getElementById('tgId');
+    const fbEl  = document.getElementById('fb');
+    const tgErr = document.getElementById('tgErr');
+    const fbErr = document.getElementById('fbErr');
+    const apiE  = document.getElementById('apiErr');
+    const btn   = document.getElementById('submitBtn');
+
+    [tgEl,fbEl].forEach(el=>el.classList.remove('e'));
+    [tgErr,fbErr].forEach(el=>el.classList.remove('on'));
+    apiE.style.display='none';
+
+    const tgId = tgEl.value.trim();
+    const fb   = fbEl.value.trim();
+    let ok = true;
+
+    if (!tgId) { tgEl.classList.add('e'); tgErr.classList.add('on'); ok=false; }
+    if (!fb)   { fbEl.classList.add('e'); fbErr.classList.add('on'); ok=false; }
+    if (!ok) return;
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const res  = await fetch('/api/feedback', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ tgId, feedback: fb })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+
+      document.getElementById('formBody').classList.add('gone');
+      document.getElementById('success').classList.add('on');
+
+    } catch(err) {
+      apiE.textContent = err.message;
+      apiE.style.display = 'block';
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key==='Enter') doSubmit();
+  });
+</script>
+</body>
+</html>
